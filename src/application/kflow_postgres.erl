@@ -76,7 +76,7 @@
 
 -behavior(kflow_gen_map).
 
--include_lib("hut/include/hut.hrl").
+-include_lib("kernel/include/logger.hrl").
 
 %% Pipe callbacks:
 -export([ init/1
@@ -131,19 +131,19 @@
 -spec ensure_partitions(config()) -> ok.
 ensure_partitions(Config = #{partitioning := _, table := Table}) ->
   Req = mk_partition_statement(Config),
-  ?log(notice, "Preparing for partition rotation. Request: ~s", [Req]),
+  ?LOG_NOTICE("Preparing for partition rotation. Request: ~s", [Req]),
   {ok, Conn} = epgsql:connect(epgsql_config(Config)),
   Result = epgsql:squery(Conn, Req),
   epgsql:close(Conn),
   case Result of
     {error, Err} ->
-      ?slog(alert,
+      ?LOG_ALERT(
             #{ what  => "Partition rotation failure"
              , table => Table
              , error => Err
              });
     Ret ->
-      ?slog(notice,
+      ?LOG_NOTICE(
             #{ what   => "Partition rotation success"
              , table  => Table
              , result => Ret
@@ -164,7 +164,7 @@ init(Config = #{fields := Fields}) ->
   {ok, Conn} = epgsql:connect(epgsql_config(Config)),
   Statement = mk_statement(Config),
   kflow_lib:redirect_logs(Conn),
-  ?log(notice, "Generated statement: ~s", [Statement]),
+  ?LOG_NOTICE("Generated statement: ~s", [Statement]),
   #s{ connection    = Conn
     , sql_statement = Statement
     , fields        = Fields
@@ -198,7 +198,7 @@ transform(Offset, Data0, S) ->
         #{Key := Val} ->
           Val;
         _->
-          ?slog(critical, #{ what  => "Missing data for a record field"
+          ?LOG_CRITICAL(#{ what  => "Missing data for a record field"
                            , data  => Data
                            , field => Key
                            }),

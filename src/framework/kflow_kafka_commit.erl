@@ -9,6 +9,8 @@
 
 -behavior(kflow_gen).
 
+-include_lib("kernel/include/logger.hrl").
+
 -include("kflow_int.hrl").
 
 -ifndef(TEST).
@@ -72,7 +74,7 @@ handle_message( Msg = #kflow_msg{ offset                 = Offset
                end,
   %% Assert:
   SafeOffset =< Offset orelse
-    ?slog(alert, #{ what           => "Offset tracking bug!"
+    ?LOG_ALERT(#{ what           => "Offset tracking bug!"
                   , safe_offset    => SafeOffset
                   , message_offset => Offset
                   }),
@@ -95,7 +97,7 @@ handle_message( Msg = #kflow_msg{ offset                 = Offset
       ok;
      %% Bug:
      true ->
-      ?slog(alert, #{ what                   => "Offset tracking bug!"
+      ?LOG_ALERT(#{ what                   => "Offset tracking bug!"
                     , message_offset         => Offset
                     , fully_processed_offset => FPO
                     , last_committed_offset  => LastCommittedOffset

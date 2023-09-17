@@ -8,6 +8,7 @@
 
 -export([init/1, in/4, out/2, terminate/2]).
 
+-include_lib("kernel/include/logger.hrl").
 -include_lib("kflow/include/kflow_int.hrl").
 
 -record(s,
@@ -38,7 +39,7 @@ in(Offset, Msg, {initialized, MS}, MC = {Module, _}) ->
   ChunkCnt = Module:chunk_count(Msg),
   Key = maps:get(key, Msg, undefined),
   if ChunkNum =:= 1 -> %% This is the beginning of a normal transfer:
-      ?slog(info, #{ what      => "New transfer"
+      ?LOG_INFO(#{ what      => "New transfer"
                    , key       => Key
                    , chunk_cnt => ChunkCnt
                    , offset    => Offset
@@ -50,7 +51,7 @@ in(Offset, Msg, {initialized, MS}, MC = {Module, _}) ->
                 },
       handle_message(Offset, ChunkNum, ChunkCnt, Msg, State, MC);
      true -> %% This is the beginning of retransmission:
-      ?slog(warning, #{ what      => "Ignoring retransmission"
+      ?LOG_WARNING(#{ what      => "Ignoring retransmission"
                       , key       => Key
                       , slice_cnt => ChunkCnt
                       , slice_num => ChunkNum
@@ -109,7 +110,7 @@ handle_message(Offset, ChunkNum, ChunkCnt, Msg, State, {Module, Config}) ->
           end,
   Key = maps:get(key, Msg, undefined),
   if ChunkNum =< LCN ->
-      ?slog(warning, #{ what            => "Retransmission; waiting for the next chunk"
+      ?LOG_WARNING(#{ what            => "Retransmission; waiting for the next chunk"
                       , key             => Key
                       , chunk_num       => ChunkNum
                       , processed_slice => LCN
@@ -119,7 +120,7 @@ handle_message(Offset, ChunkNum, ChunkCnt, Msg, State, {Module, Config}) ->
      true ->
       MS = Module:in(Offset, ChunkNum, ChunkCnt, Msg, MS0, Config),
       ChunkNum =:= LCN + 1 orelse
-        ?slog(alert, #{ what            => "Missing chunk(s); transmission is corrupted!"
+        ?LOG_ALERT(#{ what            => "Missing chunk(s); transmission is corrupted!"
                       , key             => Key
                       , chunk_cnt       => ChunkCnt
                       , chunk_num       => ChunkNum

@@ -29,6 +29,8 @@
 %%%===================================================================
 -module(kflow_wf_sysmon_receiver).
 
+-include_lib("kernel/include/logger.hrl").
+
 -include("kflow_int.hrl").
 
 %% API
@@ -171,14 +173,14 @@ parse_sysmon_message(_Offset, #{value := Bin}) ->
                  end || {FieldSpec, Val} <- lists:zip(FieldSpecs, Fields)],
         {true, Record, Ret};
       _ ->
-        ?slog(warning, #{ what   => "Unknown record"
+        ?LOG_WARNING(#{ what   => "Unknown record"
                         , record => Record
                         , fields => Fields
                         }),
         false
     end
   catch EC:Err:Stack ->
-      ?slog(warning, #{ what        => "Badly formatted sysmon message"
+      ?LOG_WARNING(#{ what        => "Badly formatted sysmon message"
                       , message     => Bin
                       , error_class => EC
                       , error       => Err

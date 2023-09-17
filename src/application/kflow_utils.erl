@@ -8,7 +8,7 @@
 %%%===================================================================
 -module(kflow_utils).
 
--include_lib("hut/include/hut.hrl").
+-include_lib("kernel/include/logger.hrl").
 -include_lib("erlcloud/include/erlcloud_aws.hrl").
 
 -export([id/1, k/2, exec/2, upload_to_s3/3, aws_config/0, ensure_string/1,
@@ -43,7 +43,7 @@ exec(CMD, Args) ->
                     , {args, Args}
                     ]
                   ),
-  ?log(debug, "port_command ~p: ~s ~p", [Port, CMD, Args]),
+  ?LOG_DEBUG("port_command ~p: ~s ~p", [Port, CMD, Args]),
   collect_port_output(Port).
 
 -spec ensure_string(string() | binary()) -> string().
@@ -73,7 +73,7 @@ retry(MFA = {M, F, A}, N, Timeout) ->
     apply(M, F, A)
   catch
     _:_ ->
-      ?log(warning, "Retrying ~p:~p/~p", [M, F, length(A)]),
+      ?LOG_WARNING("Retrying ~p:~p/~p", [M, F, length(A)]),
       timer:sleep(Timeout),
       retry(MFA, N - 1, Timeout)
   end.
@@ -92,7 +92,7 @@ collect_port_output(Port) ->
   %% together, do something about this.
   receive
     {Port, {data, Data}} ->
-      ?log(info, "Port=~p~n~s", [Port, Data]),
+      ?LOG_INFO("Port=~p~n~s", [Port, Data]),
       collect_port_output(Port);
     {Port, {exit_status, ExitStatus}} ->
       ExitStatus

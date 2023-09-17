@@ -27,6 +27,8 @@
 %%%===================================================================
 -module(kflow_multistate).
 
+-include_lib("kernel/include/logger.hrl").
+
 -include("kflow_int.hrl").
 
 %% API;
@@ -119,14 +121,14 @@ handle_message(Msg, State0, _Config) ->
       State = State1#s{states = RouteStates},
       {ok, rewrite_offsets(SafeOffset, Messages), State};
     WrongResult ->
-      ?slog(critical, #{ what       => "Kflow node invalid callback return"
+      ?LOG_CRITICAL(#{ what       => "Kflow node invalid callback return"
                        , route      => Route
                        , retur      => WrongResult
                        }),
       do_terminate(CbModule, CbState0, Config, Route),
       error(handler_error)
   catch EC:Err:Stack ->
-      ?slog(critical, #{ what       => "Kflow node callback crash"
+      ?LOG_CRITICAL(#{ what       => "Kflow node callback crash"
                        , route      => Route
                        , error      => {EC, Err}
                        , stacktrace => Stack
@@ -234,14 +236,14 @@ maybe_terminate_cb_state(Route, CbState, exit, RouteStates, CbModule, CbConfig) 
 %% @private Call terminate callback and ignore any error.
 -spec do_terminate(module(), term(), term(), kflow:route()) -> _.
 do_terminate(Module, State, Config, Route) ->
-  ?slog(debug, #{ what   => "Terminating a route"
+  ?LOG_DEBUG(#{ what   => "Terminating a route"
                 , module => Module
                 , state  => State
                 , route  => Route
                 }),
   try Module:terminate(State, Config)
   catch EC:Error:Stack ->
-      ?slog(error, #{ what       => "Crash in terminate callback"
+      ?LOG_ERROR(#{ what       => "Crash in terminate callback"
                     , module     => Module
                     , error      => {EC, Error}
                     , stacktrace => Stack

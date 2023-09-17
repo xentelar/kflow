@@ -1,5 +1,7 @@
 -module(kflow_kafka_test_helper).
 
+-include_lib("kernel/include/logger.hrl").
+
 -export([ init_per_suite/1
         , common_init_per_testcase/3
         , common_end_per_testcase/2
@@ -23,7 +25,7 @@ init_per_suite(Config) ->
   {ok, CWD} = file:get_cwd(),
   LogDir = filename:join(CWD, "kflow_logs"),
   application:load(kflow),
-  ?log(notice, "Logs will be found in ~p~n", [LogDir]),
+  ?LOG_INFO("Logs will be found in ~p~n", [LogDir]),
   application:set_env(kflow, log_dir, LogDir),
   application:set_env(kflow, pipe_log_level, debug),
   application:set_env(kflow, kafka_endpoints, [{?KAFKA_HOST, ?KAFKA_PORT}]),
@@ -79,7 +81,7 @@ produce({Topic, Partition}, Key, Value, Headers) ->
   Offset.
 
 create_topic(Name, NumPartitions) ->
-  ?log(info, "Creating Kafka topic: ~p", [Name]),
+  ?LOG_INFO("Creating Kafka topic: ~p", [Name]),
   ConfigEntries = [ {config_name, "max.message.bytes"}
                   , {config_value, "20485760"} % ~20 MB
                   ],
@@ -98,7 +100,7 @@ create_topic(Name, NumPartitions) ->
            {ok, Conn} = kpro:connect_any([{?KAFKA_HOST, ?KAFKA_PORT}], []),
            try
              {ok, Result} = kpro:request_sync(Conn, Req, 1000),
-             ?log(info, "KPRO response: ~p", [Result]),
+             ?LOG_INFO("KPRO response: ~p", [Result]),
              #{topic_errors := [#{error_code := TopicError}]} = Result#kpro_rsp.msg,
              case TopicError of
                no_error -> ok;
@@ -142,8 +144,7 @@ wait_n_messages(TestGroupId, Expected, NRetries) ->
          begin
            Offsets = kflow_kafka_test_helper:get_acked_offsets(TestGroupId),
            NMessages = lists:sum(maps:values(Offsets)),
-           ?log( notice
-               , "Number of messages processed by consumer group: ~p; total: ~p/~p"
+           ?LOG_NOTICE("Number of messages processed by consumer group: ~p; total: ~p/~p"
                , [Offsets, NMessages, Expected]
                ),
            ?assert(NMessages >= Expected)

@@ -49,10 +49,10 @@
 
 -behavior(kflow_gen_assemble_chunks).
 
+-include_lib("kernel/include/logger.hrl").
+
 %% callbacks:
 -export([terminate/2, in/6, out/2, chunk_num/1, chunk_count/1]).
-
--include_lib("hut/include/hut.hrl").
 
 %%%===================================================================
 %%% Types
@@ -135,7 +135,7 @@ terminate(#s{key = Key, upload_id = UID}, #{s3_bucket := Bucket}) ->
 
 -spec handle_singleton(string(), binary(), config()) -> state().
 handle_singleton(Key, Value, #{s3_bucket := Bucket}) ->
-  ?slog(info, #{ what => "Uploading a small object"
+  ?LOG_INFO(#{ what => "Uploading a small object"
                , key  => Key
                }),
   ok = kflow_utils:upload_to_s3(Bucket, Key, Value),

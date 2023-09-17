@@ -1,6 +1,7 @@
 -module(kflow_kafka_retransmit_SUITE).
 
 -include("kflow_int.hrl").
+-include_lib("kernel/include/logger.hrl").
 -include_lib("kflow/src/testbed/kafka_ct_setup.hrl").
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
 
@@ -56,7 +57,7 @@ t_retransmit(Config) when is_list(Config) ->
      begin
        %% Produce some messages to the upstream topic:
        [produce({?topic, 0}, integer_to_binary(I), integer_to_binary(I)) || I <- Messages],
-       ?log(notice, "Done producing messages", []),
+       ?LOG_NOTICE("Done producing messages", []),
        %% Retry until the number of messages in the downstream topic
        %% becomes equal to the expected number:
        wait_n_messages(?group_id, NMessages),
@@ -113,7 +114,7 @@ t_retransmit_crash(Config) when is_list(Config) ->
                     ),
        %% Produce some messages to the upstream topic:
        [produce({?topic, 0}, integer_to_binary(I), integer_to_binary(I)) || I <- Messages],
-       ?log(notice, "Done producing messages", []),
+       ?LOG_NOTICE("Done producing messages", []),
        %% Create downstream topic _after_ starting the producer; with
        %% some luck it will crash it "the natural way". But we also
        %% injected some errors directly into the brod produce
@@ -132,7 +133,7 @@ t_retransmit_crash(Config) when is_list(Config) ->
          Expected = [integer_to_binary(I) || I <- Messages],
          ?projection_complete(value, Received, Expected),
          NCrashes = length(?of_kind(snabbkaffe_crash, Trace)),
-         ?log(notice, "Number of injected crashes: ~p", [NCrashes])
+         ?LOG_NOTICE("Number of injected crashes: ~p", [NCrashes])
      end).
 
 %%====================================================================

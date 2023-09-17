@@ -55,7 +55,6 @@
 -behavior(kflow_gen).
 
 -include("kflow.hrl").
--include_lib("hut/include/hut.hrl").
 
 -export([init/2, handle_message/3, handle_flush/2, terminate/2]).
 
