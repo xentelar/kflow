@@ -32,7 +32,7 @@ content_types_provided(Req, State) ->
 
 handle_request(Req, State) ->
   Response = check_processes(),
-  {jsone:encode(Response), Req, State}.
+  {thoas:encode(Response), Req, State}.
 
 check_processes() ->
   Procs = supervisor:which_children(kflow_pipe_sup) ++

@@ -42,7 +42,7 @@ example_workflow() ->
   %% Define a "pipe" (much like Unix pipe):
   PipeSpec = [ %% Parse messages:
                {map, fun(_Offset, #{key => KafkaKey, value => JSON} ->
-                         (jsone:decode(JSON)) #{key => KafkaKey}
+                         (thoas:decode(JSON)) #{key => KafkaKey}
                      end}
                %% Create a "virtual partition" for each unique key:
              , {demux, fun(_Offset, #{key := Key}) ->
