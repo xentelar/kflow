@@ -38,6 +38,8 @@
 
 -behavior(kflow_gen_map).
 
+-include_lib("kernel/include/logger.hrl").
+
 -include("kflow_int.hrl").
 
 -export([init/1, map/3, terminate/1]).
@@ -115,7 +117,7 @@ map(Offset, Msg = #{partition := P, value := Val}, State) ->
            }),
       Msg;
     Err ->
-      ?slog(critical, #{ what         => "Brod produce failed"
+      ?LOG_CRITICAL(#{ what         => "Brod produce failed"
                        , topic        => Topic
                        , partition    => P
                        , input_offset => Offset

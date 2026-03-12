@@ -2,6 +2,7 @@
 
 -compile(export_all).
 
+-include_lib("kernel/include/logger.hrl").
 -include_lib("kflow/src/testbed/kafka_ct_setup.hrl").
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
 
@@ -39,8 +40,8 @@ t_basic_consume(_Config) when is_list(_Config) ->
      begin
        %% Start consumer pipe:
        PipeSpec = [ {map, fun(_, Msg) ->
-                              ?log(debug, "Debug: ~p", [Msg]),
-                              ?log(notice, "Notice: ~p", [Msg]),
+                              ?LOG_DEBUG("Debug: ~p", [Msg]),
+                              ?LOG_NOTICE("Notice: ~p", [Msg]),
                               Msg
                           end}
                   , {map, kflow_test_map, #{id => '1'}}
@@ -128,7 +129,7 @@ t_pipe_crash(_Config) when is_list(_Config) ->
          ?retry( 1000, 10
                , check_committed_offsets(?group_id, ExpectedOffsets)
                ),
-         ?log(notice, "Number of injected crashes: ~p", [NCrashes]),
+         ?LOG_NOTICE("Number of injected crashes: ~p", [NCrashes]),
          kflow_trace_specs:init_terminate(Trace)
      end).
 

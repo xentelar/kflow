@@ -1,6 +1,7 @@
 -module(kflow_chunks_to_file_SUITE).
 
 -include("kflow_int.hrl").
+-include_lib("kernel/include/logger.hrl").
 -include_lib("kflow/src/testbed/kafka_ct_setup.hrl").
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
 -include_lib("erlcloud/include/erlcloud_aws.hrl").
@@ -65,7 +66,7 @@ t_write({pipe_config, TestConfig}) ->
   make_config(TestConfig, ?topic, ?group_id);
 t_write(num_partitions) -> 1;
 t_write(Config) when is_list(Config) ->
-  ?log(notice, "Files will be found in: ~p", [location(Config)]),
+  ?LOG_NOTICE("Files will be found in: ~p", [location(Config)]),
   ChunkSize = 1 bsl 23,
   KFiles = [ {integer_to_binary(I), {100, ChunkSize * 10}}
            || I <- lists:seq(1, 10)],
@@ -95,7 +96,7 @@ t_delete({pipe_config, TestConfig}) ->
   make_config(TestConfig, ?topic, ?group_id);
 t_delete(num_partitions) -> 1;
 t_delete(Config) when is_list(Config) ->
-  ?log(notice, "Files will be found in: ~p", [location(Config)]),
+  ?LOG_NOTICE("Files will be found in: ~p", [location(Config)]),
   ChunkSize = 1 bsl 23,
   KFiles = [ {integer_to_binary(I), {100, ChunkSize * 10}}
            || I <- lists:seq(1, 10)],

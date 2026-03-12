@@ -155,8 +155,8 @@
 
 -behavior(gen_statem).
 
--include_lib("hut/include/hut.hrl").
 -include_lib("snabbkaffe/include/snabbkaffe.hrl").
+-include_lib("kernel/include/logger.hrl").
 -include("kflow.hrl").
 
 %% API
@@ -328,8 +328,8 @@ callback_mode() -> [handle_event_function, state_enter].
 -spec init(InitData :: #init_data{}) ->
               gen_statem:init_result(state()).
 init(InitData = #init_data{id = Id}) ->
-  ?set_process_metadata(#{domain => Id}),
-  ?slog(info, #{ what         => "Starting kflow_gen process"
+  logger:set_process_metadata(#{domain => Id}),
+  ?LOG_INFO(#{ what         => "Starting kflow_gen process"
                , initial_data => InitData
                , pid          => self()
                }),
@@ -348,7 +348,7 @@ handle_event(cast, ?feed(Ref, Msg), ready, Data) ->
 handle_event(cast, ?flush, ready, Data) ->
   async_callback(undefined, ?flush, ready, Data);
 handle_event(cast, ?upstream_failure, ready, Data) ->
-  ?slog(debug, #{ what => "Upstream failure"
+  ?LOG_DEBUG(#{ what => "Upstream failure"
                 , id   => Data#data.id
                 }),
   async_callback(undefined, ?flush, exiting, Data);
@@ -363,7 +363,7 @@ handle_event(enter, OldState, exiting, Data) ->
       common_state_enter(OldState, exiting, Data)
   end;
 handle_event(timeout, exit_timeout, exiting, Data) ->
-  ?slog(error, #{ what => "kflow_gen shutdown timeout"
+  ?LOG_ERROR(#{ what => "kflow_gen shutdown timeout"
                 , data => Data
                 , self => self()
                 }),
@@ -385,7 +385,7 @@ handle_event(cast, ?downstream_failure, _State, _Data) ->
 handle_event(enter, OldState, State, Data) ->
   common_state_enter(OldState, State, Data);
 handle_event(Event, Msg, State, _Data) ->
-  ?slog(warning, #{ what  => "kflow_gen unknown event"
+  ?LOG_WARNING(#{ what  => "kflow_gen unknown event"
                   , event => Event
                   , data  => Msg
                   , state => State
@@ -469,13 +469,13 @@ handle_done(Result, OldState, Data0) ->
         {EC, Error, Stack} when EC =:= error;
                                 EC =:= exit;
                                 EC =:= throw ->
-          ?slog(critical, #{ what       => "Kflow node callback crash"
+          ?LOG_CRITICAL(#{ what       => "Kflow node callback crash"
                            , error      => {EC, Error}
                            , stacktrace => Stack
                            , node_id    => Id
                            });
         _ ->
-          ?slog(critical, #{ what       => "Kflow node invalid callback return"
+          ?LOG_CRITICAL(#{ what       => "Kflow node invalid callback return"
                            , return     => WrongResult
                            , node_id    => Id
                            })
@@ -590,7 +590,7 @@ async_callback(Ref, Input, OldState, Data0) ->
                   , kflow:message() | ?flush
                   ) -> ok.
 run_callback(Parent, Id, CbModule, CbState, Config, Input) ->
-  ?set_process_metadata(#{domain => Id}),
+  logger:set_process_metadata(#{domain => Id}),
   Result = try
              case Input of
                #kflow_msg{} ->

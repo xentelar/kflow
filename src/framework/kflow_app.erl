@@ -8,6 +8,8 @@
 
 -behaviour(application).
 
+-include_lib("kernel/include/logger.hrl").
+
 -include("kflow_int.hrl").
 
 -ifndef(TEST).
@@ -55,13 +57,13 @@ load_pipe_config() ->
       ok;
     {Dir, {Module, _, _}} when is_list(Dir) ->
       Path = filename:join(Dir, atom_to_list(Module)),
-      ?slog(notice, #{ what => "Loading pipe configuration"
+      ?LOG_NOTICE(#{ what => "Loading pipe configuration"
                      , path => Path ++ ".erl"
                      }),
       Options = [binary, verbose, return],
       case compile:file(Path, Options) of
         {ok, Module, Binary, Warnings} ->
-          ?slog(notice, #{ what => "Pipe configuration has been loaded"
+          ?LOG_NOTICE(#{ what => "Pipe configuration has been loaded"
                          , warnings => Warnings
                          }),
           code:delete(Module),
@@ -69,13 +71,13 @@ load_pipe_config() ->
           code:load_binary(Module, Path, Binary),
           ok;
         {error, Errors, Warnings} ->
-          ?slog(critical, #{ what     => "Failed to compile pipe config"
+          ?LOG_CRITICAL(#{ what     => "Failed to compile pipe config"
                            , errors   => Errors
                            , warnings => Warnings
                            }),
           {error, badconfig};
         error ->
-          ?log(critical, "Failed to compile pipe config! Missing file?", []),
+          ?LOG_CRITICAL("Failed to compile pipe config! Missing file?", []),
           {error, badconfig}
       end
   end.

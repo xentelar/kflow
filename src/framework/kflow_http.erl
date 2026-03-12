@@ -15,10 +15,10 @@
 %%%
 -module(kflow_http).
 
+-include_lib("kernel/include/logger.hrl").
+
 %% API
 -export([init/0]).
-
--include_lib("hut/include/hut.hrl").
 
 init() ->
   {ok, TransportOpts} = application:get_env(kflow, healthcheck_listener),
@@ -27,10 +27,10 @@ init() ->
   CowboyStart =
     case application:get_env(kflow, healthcheck_tls) of
       {ok, true} ->
-        ?log(info, "Starting HTTPS listener with parameters ~p", [ProtocolOpts]),
+        ?LOG_INFO("Starting HTTPS listener with parameters ~p", [ProtocolOpts]),
         fun cowboy:start_tls/3;
       {ok, false} ->
-        ?log(info, "Starting HTTP listener with parameters ~p", [ProtocolOpts]),
+        ?LOG_INFO("Starting HTTP listener with parameters ~p", [ProtocolOpts]),
         fun cowboy:start_clear/3
     end,
   case CowboyStart(http, TransportOpts, ProtocolOpts) of

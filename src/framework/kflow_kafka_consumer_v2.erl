@@ -87,7 +87,7 @@ init(InitInfo, Config) ->
    , id        := ParentId
    } = Config,
   Id = ParentId ++ [list_to_atom(integer_to_list(Partition))],
-  ?set_process_metadata(#{domain => Id}),
+  logger:set_process_metadata(#{domain => Id}),
   OffsetCommiterNode = {kflow_kafka_commit, undefined, InitInfo},
   PipeSpec = case maps:get(auto_commit, Config, true) of
                true ->

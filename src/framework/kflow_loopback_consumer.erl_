@@ -87,7 +87,7 @@ stop(Pid) ->
 
 init(GroupId, Config) ->
   #{id := Id} = Config,
-  ?set_process_metadata(#{domain => kflow_lib:root_node_id(Id)}),
+  logger:set_process_metadata(#{domain => kflow_lib:root_node_id(Id)}),
   PipeConfig = init_data(Config),
   {ok, #state{ config   = PipeConfig
              , group_id = GroupId

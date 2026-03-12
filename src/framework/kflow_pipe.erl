@@ -11,8 +11,9 @@
 
 -behavior(gen_statem).
 
+-include_lib("kernel/include/logger.hrl").
+
 -include("kflow_int.hrl").
--include_lib("hut/include/hut.hrl").
 
 %% API
 -export([start_link/1, stop/1]).
@@ -124,7 +125,7 @@ callback_mode() -> handle_event_function.
 init({PipeConfig, Source}) ->
   process_flag(trap_exit, true),
   #{id := PipeId, definition := Specs} = PipeConfig,
-  ?set_process_metadata(#{domain => PipeId}),
+  logger:set_process_metadata(#{domain => PipeId}),
   FeedTimeout     = maps:get(feed_timeout, PipeConfig, 30000),
   ShutdownTimeout = maps:get(shutdown_timeout, PipeConfig, 30000),
   FlushInterval   = maps:get(flush_interval, PipeConfig, undefined),
@@ -169,7 +170,7 @@ handle_event(info, flush, normal, Data) ->
 handle_event(info, {'DOWN', _Ref, process, Pid, Reason}, State, Data) ->
   handle_down(Pid, Reason, State, Data);
 handle_event({call, From}, Msg, State, _Data) ->
-  ?slog(warning, #{ what  => "kflow_pipe unknown call"
+  ?LOG_WARNING(#{ what  => "kflow_pipe unknown call"
                   , from  => From
                   , data  => Msg
                   , state => State
@@ -178,7 +179,7 @@ handle_event({call, From}, Msg, State, _Data) ->
   Ret = {error, unknown_call},
   {keep_state_and_data, [{reply, From, Ret}]};
 handle_event(Event, Msg, State, _Data) ->
-  ?slog(warning, #{ what  => "kflow_pipe unknown event"
+  ?LOG_WARNING(#{ what  => "kflow_pipe unknown event"
                   , event => Event
                   , data  => Msg
                   , state => State
@@ -191,7 +192,7 @@ terminate(Reason, _State, Data) ->
   #data{ id           = Id
        , children     = Children
        } = Data,
-  ?slog(info, #{ what   => "kflow_pipe shutting down"
+  ?LOG_INFO(#{ what   => "kflow_pipe shutting down"
                , self   => self()
                , id     => Id
                , reason => Reason
@@ -235,7 +236,7 @@ handle_down(Pid, Reason, exiting, Data) ->
   IsChild = my_childp(Pid, Data),
   if IsLast ->
       %% Last child terminated, we can stop:
-      ?slog(info, #{ what   => "kflow_pipe last node terminated; pipe process exiting"
+      ?LOG_INFO(#{ what   => "kflow_pipe last node terminated; pipe process exiting"
                    , self   => self()
                    , id     => Id
                    , pid    => Pid
@@ -249,14 +250,14 @@ handle_down(Pid, Reason, exiting, Data) ->
                end,
       {stop, StopReason};
      IsChild ->
-      ?slog(info, #{ what   => "kflow_pipe node terminated; keep waiting for the last one"
+      ?LOG_INFO(#{ what   => "kflow_pipe node terminated; keep waiting for the last one"
                    , self   => self()
                    , id     => Id
                    , pid    => Pid
                    }),
       keep_state_and_data;
      true ->
-      ?slog(warning, #{ what   => "kflow_pipe received unexpected DOWN message"
+      ?LOG_WARNING(#{ what   => "kflow_pipe received unexpected DOWN message"
                       , self   => self()
                       , pid    => Pid
                       , reason => Reason
@@ -268,7 +269,7 @@ handle_down(Pid, Reason, _State, Data) ->
     true ->
       {next_state, exiting, Data, [postpone]};
     false ->
-      ?slog(warning, #{ what   => "kflow_pipe received unexpected DOWN message"
+      ?LOG_WARNING(#{ what   => "kflow_pipe received unexpected DOWN message"
                       , self   => self()
                       , pid    => Pid
                       , reason => Reason
@@ -283,7 +284,7 @@ handle_flush(Data0) ->
        , id             = MyId
        } = Data0,
   #{0 := Pid} = Children,
-  ?slog(info, #{ what => "Scheduled pipe flush"
+  ?LOG_INFO(#{ what => "Scheduled pipe flush"
                , id   => MyId
                }),
   kflow_gen:flush(Pid),

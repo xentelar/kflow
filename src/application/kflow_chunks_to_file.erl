@@ -59,9 +59,9 @@
 
 -behavior(kflow_gen_assemble_chunks).
 
--export([in/6, out/2, chunk_num/1, chunk_count/1]).
+-include_lib("kernel/include/logger.hrl").
 
--include_lib("hut/include/hut.hrl").
+-export([in/6, out/2, chunk_num/1, chunk_count/1]).
 
 %%%===================================================================
 %%% Types
@@ -122,7 +122,7 @@ out(State = #s{path = Path, deleted = Deleted}, _) ->
 %%%===================================================================
 
 init_transfer(Path, SliceCnt, Offset) ->
-  ?slog(info, #{ what      => "New file"
+  ?LOG_INFO(#{ what      => "New file"
                , key       => Path
                , slice_cnt => SliceCnt
                , offset    => Offset
@@ -130,14 +130,14 @@ init_transfer(Path, SliceCnt, Offset) ->
   ok = filelib:ensure_dir(Path).
 
 do_delete(Path) ->
-  ?slog(info, #{ what => "Deleted file"
+  ?LOG_INFO(#{ what => "Deleted file"
                , key  => Path
                }),
   case file:delete(Path) of
     ok ->
       ok;
     {error, Err} ->
-      ?slog(error, #{ what  => "Couldn't delete file"
+      ?LOG_ERROR(#{ what  => "Couldn't delete file"
                     , key   => Path
                     , error => Err
                     }),

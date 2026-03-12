@@ -6,7 +6,6 @@
 -behavior(kflow_multistate).
 
 -include("kflow.hrl").
--include_lib("hut/include/hut.hrl").
 
 -export([ init/3
         , handle_message/3

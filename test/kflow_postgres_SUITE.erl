@@ -1,6 +1,7 @@
 -module(kflow_postgres_SUITE).
 
 -include("kflow_int.hrl").
+-include_lib("kernel/include/logger.hrl").
 -include_lib("kflow/src/testbed/kflow_test_macros.hrl").
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
 
@@ -113,11 +114,11 @@ wait_postgres() ->
   %% postgres without dying. P.S. Simply poking port 5432 doesn't
   %% quite work, I tried. Postgres starts listening before it's
   %% actually ready.
-  ?log(notice, "Waiting for postgres", []),
+  ?LOG_NOTICE("Waiting for postgres", []),
   process_flag(trap_exit, true),
   ?retry(1000, 10,
          begin
            {ok, Conn} = epgsql:connect(db_config()),
            epgsql:close(Conn)
          end),
-  ?log(notice, "Postgres is up", []).
+  ?LOG_NOTICE("Postgres is up", []).

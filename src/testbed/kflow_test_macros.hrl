@@ -6,7 +6,6 @@
 -endif.
 -include_lib("kflow/include/kflow.hrl").
 -include_lib("kafka_protocol/include/kpro.hrl").
--include_lib("hut/include/hut.hrl").
 -include_lib("snabbkaffe/include/snabbkaffe.hrl").
 -include_lib("stdlib/include/assert.hrl").
 
