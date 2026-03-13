@@ -57,7 +57,7 @@ start_link(Config = #{ id       := Id
                      , group_id := GroupId
                      , topics   := Topics
                      }) ->
-  kflow_lib:ensure_log(Id),
+  %kflow_lib:ensure_log(Id),
   %% Construct `brod_group_subscriber_v2' config:
   ClientId = maps:get(brod_client_id, Config, ?default_brod_client),
   GSConfig = #{ cb_module       => ?MODULE
@@ -79,9 +79,9 @@ stop(Pid) ->
 %%%===================================================================
 
 init(InitInfo, Config) ->
-  #{ topic      := Topic
+  #{ topic      := _Topic
    , partition  := Partition
-   , commit_fun := CommitFun
+   , commit_fun := _CommitFun
    } = InitInfo,
   #{ pipe_spec := PipeSpec0
    , id        := ParentId
@@ -107,16 +107,16 @@ init(InitInfo, Config) ->
                             },
   %% Start pipe:
   {ok, Pid, Entrypoint} = kflow_pipe:start_link(PipeConfig),
-  ?tp(kflow_consumer_start, #{ topic     => Topic
-                             , partition => Partition
-                             , id        => Id
-                             }),
+  % ?tp(kflow_consumer_start, #{ topic     => Topic
+  %                            , partition => Partition
+  %                            , id        => Id
+  %                            }),
   {ok, #s{ pid        = Pid
          , entrypoint = Entrypoint
          }}.
 
 handle_message(MessageSet, State = #s{entrypoint = Entrypoint}) ->
-  #kafka_message_set{ high_wm_offset = HighWm
+  #kafka_message_set{ high_wm_offset = _HighWm
                     , messages       = Messages
                     , topic          = Topic
                     , partition      = Partition
@@ -162,4 +162,4 @@ init_data(Config = #{id := Id}) ->
   InitDataFields = [pipe_spec, auto_commit, feed_timeout, shutdown_timeout,
                     flush_interval],
   InitData0 = maps:with(InitDataFields, Config),
-  InitData0 #{id => NodeId}.
+  InitData0#{id => NodeId}.

@@ -80,7 +80,7 @@ pipe_spec(Config) ->
   ToClient = maps:get(from_client, Config, ?default_brod_client),
   Preprocess = maps:get(preprocess, Config, []),
   PartFun = maps:get(part_fun, Config, fun partition_by_key/2),
-  BufferConfig = maps:with([max_size, max_messages], Config),
+  %BufferConfig = maps:with([max_size, max_messages], Config),
   Preprocess ++
     [ %% Choose what partition the message should end up in the downstream topic:
       {map, ?MODULE, {PartFun, NPartitions}}

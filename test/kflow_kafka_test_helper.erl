@@ -80,16 +80,16 @@ produce({Topic, Partition}, Key, Value, Headers) ->
                                          ),
   Offset.
 
-create_topic(Name, NumPartitions) ->
-  ?LOG_INFO("Creating Kafka topic: ~p", [Name]),
-  ConfigEntries = [ {config_name, "max.message.bytes"}
-                  , {config_value, "20485760"} % ~20 MB
+create_topic(TopicName, NumPartitions) ->
+  ?LOG_INFO("Creating Kafka topic: ~p", [TopicName]),
+  ConfigEntries = [ {name, "max.message.bytes"}
+                  , {value, "20485760"} % ~20 MB
                   ],
-  TopicFields = [ {topic, Name}
+  TopicFields = [ {name, TopicName}
                 , {num_partitions, NumPartitions}
                 , {replication_factor, 1}
-                , {replica_assignment, []}
-                , {config_entries, [ConfigEntries]}
+                , {assignments, []}
+                , {configs, [ConfigEntries]}
                 ],
   Req = kpro_req_lib:create_topics( 0
                                   , [TopicFields]
@@ -101,7 +101,12 @@ create_topic(Name, NumPartitions) ->
            try
              {ok, Result} = kpro:request_sync(Conn, Req, 1000),
              ?LOG_INFO("KPRO response: ~p", [Result]),
-             #{topic_errors := [#{error_code := TopicError}]} = Result#kpro_rsp.msg,
+             %#{topic_errors := [#{error_code := TopicError}]} = Result#kpro_rsp.msg,
+             #{
+              topics := [#{name := TopicName,
+              error_code := TopicError}]
+             } = Result#kpro_rsp.msg,
+
              case TopicError of
                no_error -> ok;
                topic_already_exists -> ok

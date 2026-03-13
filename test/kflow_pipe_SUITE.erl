@@ -3,7 +3,7 @@
 -compile(export_all).
 
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
--include_lib("kflow/src/testbed/payload_gen.hrl").
+-include_lib("payload_gen.hrl").
 -include("kflow.hrl").
 
 -define(dt, 10).
@@ -22,6 +22,9 @@ init_per_suite(Config) ->
    | Config].
 
 end_per_suite(_Config) ->
+  ok.
+
+end_per_testcase(_Config) ->
   ok.
 
 suite() -> [{timetrap, {seconds, 300}}].
@@ -288,7 +291,7 @@ throughput_bench() ->
          [{pair, #{ts := T1}, #{ts := T2}}] =
            ?find_pairs( true
                       , #{?snk_kind := start_benchmark}
-                      , #{?snk_kind := complete}
+                      , #{?snk_kind => complete}
                       , Trace
                       ),
          DT = erlang:convert_time_unit(T2 - T1, native, millisecond),

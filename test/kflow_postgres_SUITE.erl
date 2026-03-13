@@ -2,7 +2,7 @@
 
 -include("kflow_int.hrl").
 -include_lib("kernel/include/logger.hrl").
--include_lib("kflow/src/testbed/kflow_test_macros.hrl").
+-include_lib("kflow_test_macros.hrl").
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
 
 -compile(export_all).
@@ -17,6 +17,9 @@ init_per_suite(Config) ->
   kflow_kafka_test_helper:init_per_suite(Config).
 
 end_per_suite(_Config) ->
+  ok.
+
+end_per_testcase(_Config) ->
   ok.
 
 common_init_per_testcase(Case, Config) ->

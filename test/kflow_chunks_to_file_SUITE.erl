@@ -2,7 +2,7 @@
 
 -include("kflow_int.hrl").
 -include_lib("kernel/include/logger.hrl").
--include_lib("kflow/src/testbed/kafka_ct_setup.hrl").
+-include_lib("kafka_ct_setup.hrl").
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
 -include_lib("erlcloud/include/erlcloud_aws.hrl").
 
@@ -26,6 +26,9 @@ init_per_suite(Config) ->
   kflow_kafka_test_helper:init_per_suite(Config).
 
 end_per_suite(_Config) ->
+  ok.
+
+end_per_testcase(_Config) ->
   ok.
 
 init_per_group(s3, Config) ->
@@ -55,7 +58,12 @@ common_init_per_testcase(Case, Config) ->
   kflow_kafka_test_helper:common_init_per_testcase(?MODULE, Case, Config).
 
 common_end_per_testcase(Case, Config) ->
-  meck:unload(kflow_utils),
+  case meck:validate(kflow_utils) of
+    true ->
+      meck:unload(kflow_utils);
+    false ->
+      ok
+  end,
   kflow_kafka_test_helper:common_end_per_testcase(Case, Config).
 
 %%====================================================================

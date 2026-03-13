@@ -28,7 +28,7 @@
         , route       :: kflow:route()
         }).
 
--type state() :: #s{}.
+%-type state() :: #s{}.
 
 %% @private
 init(_NodeId, _Route, {CbModule, CbConfig}) ->

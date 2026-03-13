@@ -28,15 +28,15 @@
 %%% Types
 %%%===================================================================
 
--type commit_fun() :: fun((brod:offset()) -> _).
+% -type commit_fun() :: fun((brod:offset()) -> _).
 
--type state() ::
-        #{ commit_fun            := commit_fun()
-         , topic                 := brod:topic()
-         , partition             := brod:partition()
-         , group_id              := brod:group_id()
-         , last_committed_offset := brod:offset()
-         }.
+% -type state() ::
+%         #{ commit_fun            := commit_fun()
+%          , topic                 := brod:topic()
+%          , partition             := brod:partition()
+%          , group_id              := brod:group_id()
+%          , last_committed_offset := brod:offset()
+%          }.
 
 %%%===================================================================
 %%% `kflow_gen' callbacks
@@ -87,12 +87,12 @@ handle_message( Msg = #kflow_msg{ offset                 = Offset
       prometheus_gauge:set( <<"kflow_kafka_offset_commit_time">>
                           , [GroupId, Topic, Partition]
                           , erlang:system_time(second)
-                          ),
-      ?tp(info, kflow_kafka_commit_offset, #{ group_id  => GroupId
-                                            , topic     => Topic
-                                            , partition => Partition
-                                            , offset    => SafeOffset
-                                            });
+                          );
+      % ?tp(info, kflow_kafka_commit_offset, #{ group_id  => GroupId
+      %                                       , topic     => Topic
+      %                                       , partition => Partition
+      %                                       , offset    => SafeOffset
+      %                                       });
      SafeOffset =:= LastCommittedOffset ->
       ok;
      %% Bug:

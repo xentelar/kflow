@@ -8,7 +8,7 @@
 
 -export([ optional_callback/4
         , optional_callback/3
-        , ensure_log/1
+%        , ensure_log/1
         , root_node_id/1
         , cfg/1
         , pretty_print_node_id/1
@@ -30,26 +30,26 @@ optional_callback(Module, Function, Args, Default) ->
       Default
   end.
 
--spec ensure_log(atom()) -> ok.
-ensure_log(Id) ->
-  Formatter       = ?cfg(pipe_log_formatter),
-  DefaultLogLevel = ?cfg(pipe_log_level),
-  LogLevels       = ?cfg(pipe_log_levels),
-  LogDir          = ?cfg(log_dir),
-  MyLogLevel      = maps:get(Id, LogLevels, DefaultLogLevel),
-  File            = filename:join(LogDir, atom_to_list(Id)),
-  Domain          = root_node_id(Id),
-  Filter          = {fun logger_filters:domain/2, {log, sub, Domain}},
-  logger:add_handler( Id
-                    , logger_disk_log_h
-                    , #{ level          => MyLogLevel
-                       , config         => #{file => File}
-                       , formatter      => Formatter
-                       , filter_default => stop
-                       , filters        => [{domain, Filter}]
-                       }
-                    ),
-  ok.
+% -spec ensure_log(atom()) -> ok.
+% ensure_log(Id) ->
+%   Formatter       = ?cfg(pipe_log_formatter),
+%   DefaultLogLevel = ?cfg(pipe_log_level),
+%   LogLevels       = ?cfg(pipe_log_levels),
+%   LogDir          = ?cfg(log_dir),
+%   MyLogLevel      = maps:get(Id, LogLevels, DefaultLogLevel),
+%   File            = filename:join(LogDir, atom_to_list(Id)),
+%   Domain          = root_node_id(Id),
+%   Filter          = {fun logger_filters:domain/2, {log, sub, Domain}},
+%   logger:add_handler( Id
+%                     , logger_disk_log_h
+%                     , #{ level          => MyLogLevel
+%                        , config         => #{file => File}
+%                        , formatter      => Formatter
+%                        , filter_default => stop
+%                        , filters        => [{domain, Filter}]
+%                        }
+%                     ),
+%   ok.
 
 -spec root_node_id(atom()) -> kflow:node_id().
 root_node_id(Root) ->

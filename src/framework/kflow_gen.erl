@@ -155,7 +155,6 @@
 
 -behavior(gen_statem).
 
--include_lib("snabbkaffe/include/snabbkaffe.hrl").
 -include_lib("kernel/include/logger.hrl").
 -include("kflow.hrl").
 
@@ -416,13 +415,13 @@ terminate(_Reason, _State, _Data) ->
                             gen_state:state_enter_result(state()).
 common_state_enter(initial, initial, Data) ->
   {next_state, initial, Data};
-common_state_enter(OldState, State, Data) ->
-  ?tp(kflow_gen_state_transition,
-      #{ state_from => OldState
-       , state_to   => State
-       , pid        => self()
-       , id         => Data#data.id
-       }),
+common_state_enter(_OldState, State, Data) ->
+  % ?tp(kflow_gen_state_transition,
+  %     #{ state_from => OldState
+  %      , state_to   => State
+  %      , pid        => self()
+  %      , id         => Data#data.id
+  %      }),
   {next_state, State, Data}.
 
 -spec handle_post_init(gen_statem:from(), {pid(), pid()}, #init_data{}) ->

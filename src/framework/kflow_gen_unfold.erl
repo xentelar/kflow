@@ -79,7 +79,7 @@
         { function :: callback_fun()
         }).
 
--type state() :: #s1{} | #s2{}.
+%-type state() :: #s1{} | #s2{}.
 
 %% @private
 init(_NodeId, {?MODULE, Fun}) when is_function(Fun) ->

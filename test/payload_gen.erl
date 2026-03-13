@@ -44,7 +44,7 @@
         , interleaved_list_gen/1
         ]).
 
--export_type([payload/0, binary_payload/0]).
+-export_type([payload/0, binary_payload/0, cont/1, chunk_state/0, interleave_state/0]).
 
 -define(hash_size, 16).
 

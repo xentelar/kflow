@@ -94,11 +94,11 @@ map(Offset, Msg = #{partition := P, value := Val}, State) ->
     , topic  = Topic
     } = State,
   TBefore = erlang:monotonic_time(millisecond),
-  ?tp(info, pre_kafka_message_send,
-      #{ topic     => Topic
-       , partition => P
-       , offset    => Offset
-       }),
+  % ?tp(info, pre_kafka_message_send,
+  %     #{ topic     => Topic
+  %      , partition => P
+  %      , offset    => Offset
+  %      }),
   case brod:produce_sync_offset(Client, Topic, P, <<>>, Val) of
     {ok, OutOffset} ->
       prometheus_gauge:set( <<"kflow_kafka_producer_offset">>
@@ -110,11 +110,11 @@ map(Offset, Msg = #{partition := P, value := Val}, State) ->
                                   , [Topic, P]
                                   , TAfter - TBefore
                                   ),
-      ?tp(info, kafka_message_sent,
-          #{ topic     => Topic
-           , partition => P
-           , offset    => Offset
-           }),
+      % ?tp(info, kafka_message_sent,
+      %     #{ topic     => Topic
+      %      , partition => P
+      %      , offset    => Offset
+      %      }),
       Msg;
     Err ->
       ?LOG_CRITICAL(#{ what         => "Brod produce failed"

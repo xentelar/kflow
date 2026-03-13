@@ -1,7 +1,7 @@
 -module(kflow_sysmon_receiver_SUITE).
 
 -include("kflow_int.hrl").
--include_lib("kflow/src/testbed/kafka_ct_setup.hrl").
+-include_lib("kafka_ct_setup.hrl").
 -include_lib("snabbkaffe/include/ct_boilerplate.hrl").
 
 -compile(export_all).
@@ -17,6 +17,9 @@ init_per_suite(Config) ->
   kflow_kafka_test_helper:init_per_suite(Config).
 
 end_per_suite(_Config) ->
+  ok.
+
+end_per_testcase(_Config) ->
   ok.
 
 suite() -> [{timetrap, {seconds, 250}}].
