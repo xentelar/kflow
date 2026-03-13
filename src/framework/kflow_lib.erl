@@ -12,7 +12,7 @@
         , root_node_id/1
         , cfg/1
         , pretty_print_node_id/1
-        , redirect_logs/1
+%        , redirect_logs/1
         ]).
 
 -spec optional_callback(module(), atom(), list()) -> ok.
@@ -66,16 +66,16 @@ pretty_print_node_id(NodeId) ->
 
 %% @private Small hack to make log messages of a process end up in our
 %% dedicated log. `Pid' should be a `gen_server' or such.
--spec redirect_logs(pid() | atom()) -> ok.
-redirect_logs(Pid) ->
-  case logger:get_process_metadata() of
-    #{domain := Domain} ->
-      sys:replace_state(Pid,
-                        fun(S) ->
-                            logger:set_process_metadata(#{domain => Domain}),
-                            S
-                        end),
-      ok;
-    _ ->
-      ok
-  end.
+% -spec redirect_logs(pid() | atom()) -> ok.
+% redirect_logs(Pid) ->
+%   case logger:get_process_metadata() of
+%     #{domain := Domain} ->
+%       sys:replace_state(Pid,
+%                         fun(S) ->
+%                             logger:set_process_metadata(#{domain => Domain}),
+%                             S
+%                         end),
+%       ok;
+%     _ ->
+%       ok
+%   end.

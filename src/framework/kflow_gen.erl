@@ -327,7 +327,7 @@ callback_mode() -> [handle_event_function, state_enter].
 -spec init(InitData :: #init_data{}) ->
               gen_statem:init_result(state()).
 init(InitData = #init_data{id = Id}) ->
-  logger:set_process_metadata(#{domain => Id}),
+  %logger:set_process_metadata(#{domain => Id}),
   ?LOG_INFO(#{ what         => "Starting kflow_gen process"
                , initial_data => InitData
                , pid          => self()
@@ -589,7 +589,7 @@ async_callback(Ref, Input, OldState, Data0) ->
                   , kflow:message() | ?flush
                   ) -> ok.
 run_callback(Parent, Id, CbModule, CbState, Config, Input) ->
-  logger:set_process_metadata(#{domain => Id}),
+  %logger:set_process_metadata(#{domain => Id}),
   Result = try
              case Input of
                #kflow_msg{} ->

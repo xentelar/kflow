@@ -125,7 +125,7 @@ callback_mode() -> handle_event_function.
 init({PipeConfig, Source}) ->
   process_flag(trap_exit, true),
   #{id := PipeId, definition := Specs} = PipeConfig,
-  logger:set_process_metadata(#{domain => PipeId}),
+  %logger:set_process_metadata(#{domain => PipeId}),
   FeedTimeout     = maps:get(feed_timeout, PipeConfig, 30000),
   ShutdownTimeout = maps:get(shutdown_timeout, PipeConfig, 30000),
   FlushInterval   = maps:get(flush_interval, PipeConfig, undefined),

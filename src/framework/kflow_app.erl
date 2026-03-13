@@ -26,8 +26,10 @@
 start(_StartType, _StartArgs) ->
   %% Avoid writing duplicate messages to the default log (unless in
   %% test build, where we want all logs in one place):
-  Filter = {fun logger_filters:domain/2, {stop, sub, [kflow_pipe]}},
-  ?TEST orelse logger:add_handler_filter(default, no_kflow_pipe, Filter),
+
+  %Filter = {fun logger_filters:domain/2, {stop, sub, [kflow_pipe]}},
+  %?TEST orelse logger:add_handler_filter(default, no_kflow_pipe, Filter),
+
   %% Start healthcheck listener:
   ok = kflow_http:init(),
   %% Load pipe configuration:

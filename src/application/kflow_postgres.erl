@@ -163,7 +163,7 @@ init(Config = #{fields := Fields}) ->
   ok = ensure_partitions(Config),
   {ok, Conn} = epgsql:connect(epgsql_config(Config)),
   Statement = mk_statement(Config),
-  kflow_lib:redirect_logs(Conn),
+  %kflow_lib:redirect_logs(Conn),
   ?LOG_NOTICE("Generated statement: ~s", [Statement]),
   #s{ connection    = Conn
     , sql_statement = Statement
